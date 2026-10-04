@@ -1,0 +1,69 @@
+name: CD
+
+on:
+  workflow_call:
+    secrets:
+      RENDER_DEPLOY_HOOK_URL:
+        required: true
+      CLOUDFLARE_DEPLOY_HOOK_URL:
+        required: true
+
+permissions:
+  contents: read
+
+concurrency:
+  group: production-deploy
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    name: Trigger Render and Cloudflare Pages
+    if: github.ref == 'refs/heads/main' && (github.event_name == 'push' || github.event_name == 'workflow_dispatch')
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    env:
+      RENDER_DEPLOY_HOOK_URL: ${{ secrets.RENDER_DEPLOY_HOOK_URL }}
+      CLOUDFLARE_DEPLOY_HOOK_URL: ${{ secrets.CLOUDFLARE_DEPLOY_HOOK_URL }}
+    steps:
+      - name: Validate deploy hooks
+        shell: bash
+        run: |
+          if [[ "$RENDER_DEPLOY_HOOK_URL" != https://api.render.com/deploy/srv-*\?key=* ]]; then
+            echo "::error::Set RENDER_DEPLOY_HOOK_URL to the deploy hook from Render Settings."
+            exit 1
+          fi
+          if [[ "$CLOUDFLARE_DEPLOY_HOOK_URL" != https://api.cloudflare.com/client/v4/pages/webhooks/deploy_hooks/* ]]; then
+            echo "::error::Set CLOUDFLARE_DEPLOY_HOOK_URL to a Cloudflare Pages deploy hook for main."
+            exit 1
+          fi
+
+      - name: Trigger backend deployment for this commit
+        shell: bash
+        run: |
+          status=$(curl --silent --output /dev/null --write-out '%{http_code}' \
+            --connect-timeout 15 --max-time 60 --request POST \
+            "${RENDER_DEPLOY_HOOK_URL}&ref=${GITHUB_SHA}") || {
+              echo "::error::Could not reach the Render deploy hook."
+              exit 1
+            }
+          if [[ "$status" != 2?? ]]; then
+            echo "::error::Render rejected the deploy request (HTTP $status)."
+            exit 1
+          fi
+          echo "Render accepted the deployment request for $GITHUB_SHA." >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Trigger frontend deployment
+        shell: bash
+        run: |
+          status=$(curl --silent --output /dev/null --write-out '%{http_code}' \
+            --connect-timeout 15 --max-time 60 --request POST \
+            "$CLOUDFLARE_DEPLOY_HOOK_URL") || {
+              echo "::error::Could not reach the Cloudflare Pages deploy hook."
+              exit 1
+            }
+          if [[ "$status" != 2?? ]]; then
+            echo "::error::Cloudflare Pages rejected the deploy request (HTTP $status)."
+            exit 1
+          fi
+          echo "Cloudflare Pages accepted the deployment request for its configured branch." >> "$GITHUB_STEP_SUMMARY"
+          echo "These hooks queue builds; check both provider dashboards for the final deployment status." >> "$GITHUB_STEP_SUMMARY"

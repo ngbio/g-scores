@@ -14,10 +14,11 @@ export default function ScoreLookup() {
 
   function submit(event) {
     event.preventDefault();
-    const number = input.trim();
-    if (!/^[0-9]{8,}$/.test(number) || number.length > 255) {
+    const raw = input.trim();
+    const number = String(Number(raw));
+    if (!/^[0-9]{1,10}$/.test(raw) || Number(raw) < 1 || Number(raw) > 2147483647) {
       setValidation(
-        "Số báo danh phải gồm từ 8 đến 255 chữ số (0–9). Nếu thiếu số 0 ở đầu, hãy nhập đầy đủ.",
+        "Số báo danh phải là số nguyên từ 1 đến 2147483647.",
       );
       return;
     }
@@ -44,9 +45,9 @@ export default function ScoreLookup() {
               type="text"
               inputMode="numeric"
               autoComplete="off"
-              placeholder="Ví dụ: 01000001"
-              minLength={8}
-              maxLength={255}
+              placeholder="Ví dụ: 1000001"
+              minLength={1}
+              maxLength={10}
               value={input}
               onChange={(event) => {
                 setInput(event.target.value);
@@ -60,7 +61,7 @@ export default function ScoreLookup() {
             </button>
           </div>
           <p id="sbd-hint" className="hint">
-            Số báo danh gồm ít nhất 8 chữ số. Giữ nguyên số 0 ở đầu.
+            Nhập số báo danh, ví dụ 1000001.
           </p>
           {validation && (
             <p id="sbd-error" className="field-error" role="alert">

@@ -31,7 +31,7 @@ public class StudentController {
         }
 
         var studentScores =
-                studentService.getScores(request.registrationNumber());
+                studentService.getScores(Integer.valueOf(request.registrationNumber()));
 
         return new ApiResponse<>(200, "Lấy điểm sinh viên thành công", studentScores);
     }

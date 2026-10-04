@@ -3,7 +3,7 @@ package com.gscores.backend.dto;
 import java.math.BigDecimal;
 
 public record TopStudentResponse(
-        String registrationNumber,
+        Integer registrationNumber,
         BigDecimal mathScore,
         BigDecimal physicsScore,
         BigDecimal chemistryScore,

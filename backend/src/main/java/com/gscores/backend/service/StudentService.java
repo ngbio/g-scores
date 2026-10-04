@@ -21,7 +21,7 @@ public class StudentService {
     private final SubjectRepository subjects;
 
     @Transactional(readOnly = true)
-    public StudentScoresResponse getScores(String registrationNumber) {
+    public StudentScoresResponse getScores(Integer registrationNumber) {
         var student = students.findById(registrationNumber)
             .orElseThrow(() ->
                 new StudentNotFoundException(registrationNumber));

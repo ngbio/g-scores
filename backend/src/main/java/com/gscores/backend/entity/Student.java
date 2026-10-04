@@ -16,12 +16,12 @@ import lombok.NoArgsConstructor;
 @Table(name = "students")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Student implements Persistable<String> {
+public class Student implements Persistable<Integer> {
     @Transient
     private boolean isNew = true;
 
     @Override
-    public String getId() { return registrationNumber; }
+    public Integer getId() { return registrationNumber; }
 
     @Override
     public boolean isNew() { return isNew; }
@@ -31,13 +31,13 @@ public class Student implements Persistable<String> {
     void markPersisted() { isNew = false; }
 
     @Id
-    @Column(name = "registration_number", length = 255, nullable = false)
-    private String registrationNumber;
+    @Column(name = "registration_number", nullable = false)
+    private Integer registrationNumber;
 
     @Column(name = "foreign_language_code", length = 255)
     private String foreignLanguageCode;
 
-    public Student(String registrationNumber, String foreignLanguageCode) {
+    public Student(Integer registrationNumber, String foreignLanguageCode) {
         this.registrationNumber = registrationNumber;
         this.foreignLanguageCode = foreignLanguageCode;
     }

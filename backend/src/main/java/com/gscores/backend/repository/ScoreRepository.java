@@ -10,5 +10,5 @@ import java.util.List;
 
 public interface ScoreRepository extends JpaRepository<Score, ScoreId> {
     @Query("select s from Score s where s.id.registrationNumber = :registrationNumber")
-    List<Score> findByRegistrationNumber(@Param("registrationNumber") String registrationNumber);
+    List<Score> findByRegistrationNumber(@Param("registrationNumber") Integer registrationNumber);
 }

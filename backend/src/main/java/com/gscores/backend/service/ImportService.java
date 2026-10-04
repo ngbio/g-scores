@@ -55,7 +55,7 @@ public class ImportService {
             throw new IllegalStateException("Missing subjects; run Flyway migrations first");
         }
 
-        var seenNumbers = new HashSet<String>();
+        var seenNumbers = new HashSet<Integer>();
         var batch = new ArrayList<ParsedStudentRow>(batchSize);
         try (var parser = openCsv(path)) {
             for (var record : parser) {
@@ -125,7 +125,14 @@ public class ImportService {
         if (!record.isConsistent()) {
             throw new IllegalArgumentException("Column count does not match header");
         }
-        String sbd = record.get("sbd").trim();
+        String rawSbd = record.get("sbd").trim();
+        if (!rawSbd.matches("[0-9]{1,10}")) {
+            throw new IllegalArgumentException("SBD must contain 1 to 10 digits");
+        }
+        Integer sbd = Integer.valueOf(rawSbd);
+        if (sbd <= 0) {
+            throw new IllegalArgumentException("SBD must be a positive integer");
+        }
         String language = record.get("ma_ngoai_ngu").trim();
         var scores = new LinkedHashMap<String, BigDecimal>();
         for (String code : SUBJECT_CODES) {

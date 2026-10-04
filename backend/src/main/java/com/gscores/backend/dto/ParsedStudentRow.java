@@ -4,7 +4,7 @@ import java.math.BigDecimal;
 import java.util.Map;
 
 public record ParsedStudentRow(
-    String registrationNumber, 
+    Integer registrationNumber,
     String foreignLanguageCode,
     Map<String, BigDecimal> scores
 ) {

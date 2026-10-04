@@ -15,13 +15,13 @@ import lombok.NoArgsConstructor;
 public class ScoreId implements Serializable {
     private static final long serialVersionUID = 1L;
 
-    @Column(name = "student_registration_number", length = 255)
-    private String registrationNumber;
+    @Column(name = "student_registration_number")
+    private Integer registrationNumber;
 
     @Column(name = "subject_id")
     private Integer subjectId;
 
-    public ScoreId(String registrationNumber, Integer subjectId) {
+    public ScoreId(Integer registrationNumber, Integer subjectId) {
         this.registrationNumber = registrationNumber;
         this.subjectId = subjectId;
     }
