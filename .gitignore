@@ -1,0 +1,9 @@
+.env
+.env.*
+!.env.example
+!.env.production.example
+backend/target/
+/.verification/
+import-run.log
+import.pid
+import-run.log
